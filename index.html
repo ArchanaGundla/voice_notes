@@ -79,7 +79,7 @@ function start() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        alert("Speech Recognition not supported in this browser");
+        alert("Speech Recognition not supported");
         return;
     }
 
@@ -102,13 +102,17 @@ function start() {
     };
 
     recognition.onerror = function(event) {
-        alert("Error: " + event.error);
+        console.log("Error:", event.error);
     };
 
     recognition.onend = function() {
-        isListening = false;
-        document.getElementById("status").innerText = "🔴 Stopped";
-        document.getElementById("status").style.color = "red";
+        // 🔥 AUTO RESTART (KEY FIX)
+        if (isListening) {
+            recognition.start();
+        } else {
+            document.getElementById("status").innerText = "🔴 Stopped";
+            document.getElementById("status").style.color = "red";
+        }
     };
 
     recognition.start();
@@ -116,7 +120,8 @@ function start() {
 }
 
 function stop() {
-    if (recognition && isListening) {
+    isListening = false;
+    if (recognition) {
         recognition.stop();
     }
 }
