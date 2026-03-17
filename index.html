@@ -22,23 +22,28 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+h2 {
+    margin-bottom: 10px;
+}
+
+#status {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
 button {
     padding: 10px 15px;
     margin: 5px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .start { background: green; color: white; }
 .stop { background: red; color: white; }
 .copy { background: blue; color: white; }
 .clear { background: gray; color: white; }
-
-#status {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
 
 #output {
     margin-top: 15px;
@@ -89,11 +94,18 @@ function start() {
     document.getElementById("status").style.color = "green";
 
     recognition.onresult = function(event) {
-        let text = "";
+        let finalText = "";
+        let interimText = "";
+
         for (let i = 0; i < event.results.length; i++) {
-            text += event.results[i][0].transcript + " ";
+            if (event.results[i].isFinal) {
+                finalText += event.results[i][0].transcript + " ";
+            } else {
+                interimText += event.results[i][0].transcript;
+            }
         }
-        document.getElementById("output").innerText = text;
+
+        document.getElementById("output").innerText = finalText + interimText;
     };
 
     recognition.onerror = function(event) {
