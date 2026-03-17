@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speech to Text App</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #f4f6f9;
+    padding: 20px;
+}
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.start { background: green; color: white; }
+.stop { background: red; color: white; }
+.copy { background: blue; color: white; }
+.clear { background: gray; color: white; }
+#output {
+    margin-top: 15px;
+    min-height: 100px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🎤 Speech to Text</h2>
+
+    <button class="start" onclick="start()">Start</button>
+    <button class="stop" onclick="stop()">Stop</button>
+    <button class="copy" onclick="copyText()">Copy</button>
+    <button class="clear" onclick="clearText()">Clear</button>
+
+    <div id="output">Your speech will appear here...</div>
+</div>
+
+<script>
+let recognition;
+
+function start() {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+
+    recognition.onresult = function(event) {
+        let text = event.results[event.results.length - 1][0].transcript;
+        document.getElementById("output").innerText += " " + text;
+    };
+
+    recognition.start();
+}
+
+function stop() {
+    if (recognition) recognition.stop();
+}
+
+function copyText() {
+    let text = document.getElementById("output").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+}
+
+function clearText() {
+    document.getElementById("output").innerText = "";
+}
+</script>
+
+</body>
+</html>
