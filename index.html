@@ -74,6 +74,7 @@ button {
 <script>
 let recognition;
 let isListening = false;
+let finalTranscript = "";
 
 function start() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -94,18 +95,20 @@ function start() {
     document.getElementById("status").style.color = "green";
 
     recognition.onresult = function(event) {
-        let finalText = "";
-        let interimText = "";
+        let interimTranscript = "";
 
-        for (let i = 0; i < event.results.length; i++) {
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            let transcript = event.results[i][0].transcript;
+
             if (event.results[i].isFinal) {
-                finalText += event.results[i][0].transcript + " ";
+                finalTranscript += transcript + " ";
             } else {
-                interimText += event.results[i][0].transcript;
+                interimTranscript += transcript;
             }
         }
 
-        document.getElementById("output").innerText = finalText + interimText;
+        document.getElementById("output").innerText =
+            finalTranscript + interimTranscript;
     };
 
     recognition.onerror = function(event) {
@@ -137,6 +140,7 @@ function copyText() {
 }
 
 function clearText() {
+    finalTranscript = ""; // IMPORTANT FIX
     document.getElementById("output").innerText = "";
 }
 </script>
