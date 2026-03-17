@@ -12,7 +12,6 @@ body {
     background: #f4f6f9;
     padding: 20px;
 }
-
 .container {
     background: white;
     padding: 20px;
@@ -21,37 +20,23 @@ body {
     margin: auto;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-
-h2 {
-    margin-bottom: 10px;
-}
-
-#status {
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
 button {
     padding: 10px 15px;
     margin: 5px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
 }
-
 .start { background: green; color: white; }
 .stop { background: red; color: white; }
 .copy { background: blue; color: white; }
 .clear { background: gray; color: white; }
-
 #output {
     margin-top: 15px;
-    min-height: 120px;
+    min-height: 100px;
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 6px;
-    text-align: left;
 }
 </style>
 </head>
@@ -60,8 +45,6 @@ button {
 
 <div class="container">
     <h2>🎤 Speech to Text</h2>
-
-    <p id="status" style="color:red;">🔴 Not Listening</p>
 
     <button class="start" onclick="start()">Start</button>
     <button class="stop" onclick="stop()">Stop</button>
@@ -73,63 +56,20 @@ button {
 
 <script>
 let recognition;
-let isListening = false;
-let finalTranscript = "";
 
 function start() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-        alert("Speech Recognition not supported. Use Chrome.");
-        return;
-    }
-
-    if (isListening) return;
-
-    recognition = new SpeechRecognition();
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    document.getElementById("status").innerText = "🟢 Listening...";
-    document.getElementById("status").style.color = "green";
 
     recognition.onresult = function(event) {
-        let interimTranscript = "";
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            let transcript = event.results[i][0].transcript;
-
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript + " ";
-            } else {
-                interimTranscript += transcript;
-            }
-        }
-
-        document.getElementById("output").innerText =
-            finalTranscript + interimTranscript;
-    };
-
-    recognition.onerror = function(event) {
-        alert("Error: " + event.error);
-    };
-
-    recognition.onend = function() {
-        if (isListening) {
-            recognition.start(); // auto restart
-        } else {
-            document.getElementById("status").innerText = "🔴 Stopped";
-            document.getElementById("status").style.color = "red";
-        }
+        let text = event.results[event.results.length - 1][0].transcript;
+        document.getElementById("output").innerText += " " + text;
     };
 
     recognition.start();
-    isListening = true;
 }
 
 function stop() {
-    isListening = false;
     if (recognition) recognition.stop();
 }
 
@@ -140,7 +80,6 @@ function copyText() {
 }
 
 function clearText() {
-    finalTranscript = ""; // IMPORTANT FIX
     document.getElementById("output").innerText = "";
 }
 </script>
