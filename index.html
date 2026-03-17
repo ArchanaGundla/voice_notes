@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Speech to Text App</title>
 
+<!-- Language Detection Library -->
+<script src="https://unpkg.com/franc@5.0.0/index.min.js"></script>
+
 <style>
 body {
     font-family: Arial;
@@ -22,13 +25,8 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h2 {
-    margin-bottom: 10px;
-}
-
 #status {
     font-weight: bold;
-    margin-bottom: 10px;
 }
 
 button {
@@ -37,7 +35,6 @@ button {
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
 }
 
 .start { background: green; color: white; }
@@ -62,6 +59,7 @@ button {
     <h2>🎤 Speech to Text</h2>
 
     <p id="status" style="color:red;">🔴 Not Listening</p>
+    <p id="language">🌐 Language: Unknown</p>
 
     <button class="start" onclick="start()">Start</button>
     <button class="stop" onclick="stop()">Stop</button>
@@ -98,7 +96,24 @@ function start() {
         for (let i = event.resultIndex; i < event.results.length; i++) {
             text += event.results[i][0].transcript;
         }
+
         document.getElementById("output").innerText = text;
+
+        // 🌐 Language Detection
+        if (text.length > 3) {
+            let langCode = franc(text);
+
+            let langMap = {
+                "eng": "English",
+                "hin": "Hindi",
+                "mar": "Marathi"
+            };
+
+            let language = langMap[langCode] || "Unknown";
+
+            document.getElementById("language").innerText =
+                "🌐 Language: " + language;
+        }
     };
 
     recognition.onerror = function(event) {
@@ -106,9 +121,8 @@ function start() {
     };
 
     recognition.onend = function() {
-        // 🔥 AUTO RESTART (KEY FIX)
         if (isListening) {
-            recognition.start();
+            recognition.start(); // auto restart
         } else {
             document.getElementById("status").innerText = "🔴 Stopped";
             document.getElementById("status").style.color = "red";
@@ -121,9 +135,7 @@ function start() {
 
 function stop() {
     isListening = false;
-    if (recognition) {
-        recognition.stop();
-    }
+    if (recognition) recognition.stop();
 }
 
 function copyText() {
